@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>端口转发管理</title>
+  <style>
+    body {
+      font-family: 'Microsoft YaHei', Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      color: #2c3e50;
+      margin-top: 0;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+    }
+    
+    .form-container {
+      margin-bottom: 30px;
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 5px;
+      border-left: 4px solid #3498db;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    input[type="text"], 
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    
+    .btn-primary {
+      background-color: #3498db;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: #2980b9;
+    }
+    
+    .btn-success {
+      background-color: #2ecc71;
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background-color: #27ae60;
+    }
+    
+    .btn-danger {
+      background-color: #e74c3c;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background-color: #c0392b;
+    }
+    
+    .btn-warning {
+      background-color: #f39c12;
+      color: white;
+    }
+    
+    .btn-warning:hover {
+      background-color: #d35400;
+    }
+    
+    .btn-refresh {
+      background-color: #7f8c8d;
+      color: white;
+      font-size: 0.9em;
+      padding: 6px 12px;
+    }
+    
+    .btn-refresh:hover {
+      background-color: #636e72;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    th {
+      background-color: #f2f2f2;
+      color: #333;
+      font-weight: bold;
+    }
+    
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+    
+    .status {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 3px;
+      font-size: 0.85em;
+    }
+    
+    .status-active {
+      background-color: #2ecc71;
+      color: white;
+    }
+    
+    .status-inactive, .status-stopped {
+      background-color: #95a5a6;
+      color: white;
+    }
+    
+    .status-error {
+      background-color: #e74c3c;
+      color: white;
+    }
+    
+    .button-group form {
+      display: inline-block;
+      margin-right: 5px;
+    }
+    
+    .no-rules {
+      text-align: center;
+      margin: 30px 0;
+      color: #7f8c8d;
+    }
+    
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      margin-left: 5px;
+      cursor: help;
+    }
+
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      width: 200px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .address-form {
+      margin-top: 10px;
+    }
+    
+    .form-divider {
+      border-top: 1px dashed #ccc;
+      margin: 15px 0;
+    }
+    
+    .badge {
+      display: inline-block;
+      border-radius: 3px;
+      padding: 2px 5px;
+      font-size: 0.75em;
+      margin-left: 5px;
+      color: white;
+    }
+    
+    .badge-tcp {
+      background-color: #34495e;
+    }
+    
+    .badge-socks {
+      background-color: #8e44ad;
+    }
+    
+    .badge-http {
+      background-color: #16a085;
+    }
+    
+    .badge-unix {
+      background-color: #d35400;
+    }
+    
+    .badge-windows {
+      background-color: #2980b9;
+    }
+    
+    .search-bar {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .search-bar input {
+      flex: 1;
+      margin-right: 10px;
+    }
+    
+    .tab-container {
+      margin-top: 30px;
+    }
+    
+    .tab-buttons {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 15px;
+    }
+    
+    .tab-button {
+      padding: 10px 15px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-weight: bold;
+      color: #7f8c8d;
+      margin-right: 10px;
+    }
+    
+    .tab-button.active {
+      border-bottom-color: #3498db;
+      color: #3498db;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .port-container {
+      background: #f9f9f9;
+      border-radius: 5px;
+      padding: 15px;
+      margin-top: 20px;
+      position: relative;
+    }
+    
+    .port-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .port-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+      gap: 8px;
+      margin-top: 15px;
+    }
+    
+    .port-item {
+      text-align: center;
+      border-radius: 4px;
+      padding: 5px;
+      font-size: 0.85em;
+      background-color: #ecf0f1;
+      position: relative;
+    }
+    
+    .port-item.in-use {
+      background-color: #e74c3c;
+      color: white;
+    }
+    
+    .port-item.in-use.by-app {
+      background-color: #2ecc71;
+      color: white;
+    }
+    
+    .port-info {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      background-color: #34495e;
+      color: white;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      z-index: 10;
+      display: none;
+      text-align: left;
+    }
+    
+    .port-item:hover .port-info {
+      display: block;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      
+      th, td {
+        padding: 8px;
+      }
+      
+      .port-grid {
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>端口转发管理</h1>
+    
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <button class="tab-button active" data-tab="rulesTab">转发规则</button>
+        <button class="tab-button" data-tab="portsTab">系统端口</button>
+      </div>
+      
+      <div id="rulesTab" class="tab-content active">
+        <div class="form-container">
+          <h2>添加新转发规则</h2>
+          
+          <form action="/add" method="POST" id="forwardingForm">
+            <div class="form-group">
+              <label for="forwardingType">转发类型</label>
+              <select id="forwardingType" name="forwardingType" onchange="updateFormFields()">
+                <option value="tcp">TCP端口转发</option>
+                <option value="socks">SOCKS代理转发</option>
+                <option value="http">HTTP代理转发</option>
+                <option value="unix_socket">Unix Socket转发</option>
+                <option value="windows_pipe">Windows命名管道转发</option>
+              </select>
+            </div>
+            
+            <!-- TCP转发表单字段 -->
+            <div id="tcpFields">
+              <div class="form-row" style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;">
+                  <label for="sourceIP">
+                    源IP地址
+                    <span class="tooltip">?
+                      <span class="tooltip-text">可选，留空表示绑定所有地址(0.0.0.0)</span>
+                    </span>
+                  </label>
+                  <input type="text" id="sourceIP" name="sourceIP" placeholder="例如: 192.168.1.100">
+                </div>
+                
+                <div class="form-group" style="flex: 1;">
+                  <label for="sourcePort">
+                    源端口
+                    <span class="tooltip">?
+                      <span class="tooltip-text">本地监听的端口</span>
+                    </span>
+                  </label>
+                  <input type="number" id="sourcePort" name="sourcePort" placeholder="例如: 8899" required>
+                </div>
+                
+                <div class="form-group" style="flex: 1;">
+                  <label for="targetHost">目标主机</label>
+                  <input type="text" id="targetHost" name="targetHost" placeholder="例如: 127.0.0.1" required>
+                </div>
+                
+                <div class="form-group" style="flex: 1;">
+                  <label for="targetPort">目标端口</label>
+                  <input type="number" id="targetPort" name="targetPort" placeholder="例如: 8800" required>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Socket/命名管道转发表单字段 -->
+            <div id="socketFields" class="hidden">
+              <div class="form-row" style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;">
+                  <label for="sourceAddress">
+                    源地址
+                    <span class="tooltip">?
+                      <span class="tooltip-text" id="sourceAddressTooltip">
+                        Unix Socket: /tmp/my.sock 或 /var/run/my.sock
+                      </span>
+                    </span>
+                  </label>
+                  <input type="text" id="sourceAddress" name="sourceAddress" placeholder="">
+                </div>
+                
+                <div class="form-group" style="flex: 1;">
+                  <label for="targetAddress">
+                    目标地址
+                    <span class="tooltip">?
+                      <span class="tooltip-text" id="targetAddressTooltip">
+                        Unix Socket: /tmp/target.sock
+                      </span>
+                    </span>
+                  </label>
+                  <input type="text" id="targetAddress" name="targetAddress" placeholder="">
+                </div>
+              </div>
+            </div>
+            
+            <!-- 代理转发表单字段 -->
+            <div id="proxyFields" class="hidden">
+              <div class="form-row" style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;">
+                  <label for="proxySourcePort">
+                    监听端口
+                    <span class="tooltip">?
+                      <span class="tooltip-text">应用将监听此端口接收请求</span>
+                    </span>
+                  </label>
+                  <input type="number" id="proxySourcePort" name="proxySourcePort" placeholder="例如: 8888" required>
+                </div>
+                
+                <div class="form-group" style="flex: 1;">
+                  <label for="proxyTargetHost">
+                    代理服务器地址
+                    <span class="tooltip">?
+                      <span class="tooltip-text" id="proxyTargetHostTooltip">
+                        SOCKS代理服务器的IP地址
+                      </span>
+                    </span>
+                  </label>
+                  <input type="text" id="proxyTargetHost" name="proxyTargetHost" placeholder="例如: 127.0.0.1" required>
+                </div>
+                
+                <div class="form-group" style="flex: 1;">
+                  <label for="proxyTargetPort">
+                    代理服务器端口
+                    <span class="tooltip">?
+                      <span class="tooltip-text" id="proxyTargetPortTooltip">
+                        SOCKS代理服务器的端口号
+                      </span>
+                    </span>
+                  </label>
+                  <input type="number" id="proxyTargetPort" name="proxyTargetPort" placeholder="例如: 10020" required>
+                </div>
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">添加转发规则</button>
+          </form>
+        </div>
+        
+        <h2>当前转发规则</h2>
+        
+        <% if (rules && rules.length > 0) { %>
+          <table>
+            <thead>
+              <tr>
+                <th>源地址</th>
+                <th>目标地址</th>
+                <th>类型</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% rules.forEach(rule => { %>
+                <tr>
+                  <td>
+                    <% if (rule.sourceAddress) { %>
+                      <%= rule.sourceAddress %>
+                    <% } else { %>
+                      <%= rule.sourceIP || '0.0.0.0' %>:<%= rule.sourcePort %>
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (rule.targetAddress) { %>
+                      <%= rule.targetAddress %>
+                    <% } else { %>
+                      <%= rule.targetHost %>:<%= rule.targetPort %>
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (rule.forwardingType === 'socks') { %>
+                      <span class="badge badge-socks">SOCKS代理</span>
+                    <% } else if (rule.forwardingType === 'http') { %>
+                      <span class="badge badge-http">HTTP代理</span>
+                    <% } else if (rule.forwardingType === 'unix_socket') { %>
+                      <span class="badge badge-unix">Unix Socket</span>
+                    <% } else if (rule.forwardingType === 'windows_pipe') { %>
+                      <span class="badge badge-windows">Windows命名管道</span>
+                    <% } else { %>
+                      <span class="badge badge-tcp">TCP</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (rule.status === 'active') { %>
+                      <span class="status status-active">活跃</span>
+                    <% } else if (rule.status === 'error') { %>
+                      <span class="status status-error">错误</span>
+                      <div style="font-size: 0.8em; color: #e74c3c; margin-top: 5px;">
+                        <%= rule.error || '未知错误' %>
+                      </div>
+                    <% } else { %>
+                      <span class="status status-inactive">停止</span>
+                    <% } %>
+                  </td>
+                  <td class="button-group">
+                    <form action="/toggle/<%= rule.id %>" method="POST">
+                      <% if (rule.active) { %>
+                        <button type="submit" class="btn btn-warning">停止</button>
+                      <% } else { %>
+                        <button type="submit" class="btn btn-success">启动</button>
+                      <% } %>
+                    </form>
+                    
+                    <form action="/delete/<%= rule.id %>" method="POST" onsubmit="return confirm('确定要删除这条转发规则吗?');">
+                      <button type="submit" class="btn btn-danger">删除</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        <% } else { %>
+          <div class="no-rules">
+            <p>当前没有配置转发规则。请添加新的转发规则。</p>
+          </div>
+        <% } %>
+      </div>
+      
+      <div id="portsTab" class="tab-content">
+        <div class="port-container">
+          <div class="port-title">
+            <h2>系统端口使用情况</h2>
+            <form action="/refresh-ports" method="POST" style="margin: 0;">
+              <button type="submit" class="btn btn-refresh">刷新</button>
+            </form>
+          </div>
+          
+          <div class="search-bar">
+            <input type="text" id="portSearch" placeholder="搜索端口、进程名..." onkeyup="filterPorts()">
+            <select id="portFilter" onchange="filterPorts()">
+              <option value="all">全部</option>
+              <option value="in-use">已使用</option>
+              <option value="by-app">应用使用</option>
+            </select>
+          </div>
+          
+          <p id="portCount">
+            共找到 <strong><%= systemPorts.length %></strong> 个已使用端口
+          </p>
+          
+          <div class="port-grid" id="portGrid">
+            <% if (systemPorts && systemPorts.length > 0) { %>
+              <% systemPorts.forEach(port => { 
+                  // 检查端口是否被当前程序使用
+                  const isAppPort = rules && rules.some(rule => {
+                    if (rule.sourcePort && parseInt(rule.sourcePort) === port.port) {
+                      return true;
+                    }
+                    if (rule.sourceAddress) {
+                      const colonIndex = rule.sourceAddress.lastIndexOf(':');
+                      if (colonIndex > 0) {
+                        const portStr = rule.sourceAddress.substring(colonIndex + 1);
+                        return parseInt(portStr) === port.port;
+                      }
+                    }
+                    return false;
+                  });
+              %>
+                <div class="port-item in-use <%= isAppPort ? 'by-app' : '' %>" data-port="<%= port.port %>" data-process="<%= port.processName %>">
+                  <%= port.port %>
+                  <div class="port-info">
+                    <div><strong>端口</strong>: <%= port.port %></div>
+                    <div><strong>协议</strong>: <%= port.protocol %></div>
+                    <div><strong>进程</strong>: <%= port.processName %></div>
+                    <div><strong>PID</strong>: <%= port.pid %></div>
+                    <% if (isAppPort) { %>
+                      <div><strong>状态</strong>: 被本应用使用</div>
+                    <% } %>
+                  </div>
+                </div>
+              <% }); %>
+            <% } else { %>
+              <p>没有找到已使用的端口信息。</p>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // 端口查询和过滤
+    function filterPorts() {
+      const searchTerm = document.getElementById('portSearch').value.toLowerCase();
+      const filterType = document.getElementById('portFilter').value;
+      const portItems = document.querySelectorAll('.port-item');
+      let visibleCount = 0;
+      
+      portItems.forEach(item => {
+        const port = item.getAttribute('data-port');
+        const process = item.getAttribute('data-process').toLowerCase();
+        const isAppPort = item.classList.contains('by-app');
+        let shouldShow = true;
+        
+        // 检查搜索条件
+        if (searchTerm) {
+          shouldShow = port.includes(searchTerm) || process.includes(searchTerm);
+        }
+        
+        // 检查过滤条件
+        if (shouldShow && filterType !== 'all') {
+          if (filterType === 'by-app' && !isAppPort) {
+            shouldShow = false;
+          }
+        }
+        
+        // 显示或隐藏项目
+        if (shouldShow) {
+          item.style.display = '';
+          visibleCount++;
+        } else {
+          item.style.display = 'none';
+        }
+      });
+      
+      // 更新显示的端口数量
+      document.getElementById('portCount').innerHTML = 
+        `显示 <strong>${visibleCount}</strong> 个端口（共 <strong>${portItems.length}</strong> 个）`;
+    }
+    
+    // 标签页切换功能
+    document.addEventListener('DOMContentLoaded', function() {
+      const tabButtons = document.querySelectorAll('.tab-button');
+      const tabContents = document.querySelectorAll('.tab-content');
+      
+      tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const tabId = this.getAttribute('data-tab');
+          
+          // 更新按钮状态
+          tabButtons.forEach(btn => btn.classList.remove('active'));
+          this.classList.add('active');
+          
+          // 更新内容显示
+          tabContents.forEach(content => {
+            content.classList.remove('active');
+            if (content.id === tabId) {
+              content.classList.add('active');
+            }
+          });
+        });
+      });
+      
+      // 初始化表单字段
+      updateFormFields();
+      
+      // 为代理表单添加提交处理
+      document.getElementById('forwardingForm').addEventListener('submit', function(e) {
+        const forwardingType = document.getElementById('forwardingType').value;
+        
+        if (forwardingType === 'socks' || forwardingType === 'http') {
+          e.preventDefault();
+          
+          // 获取代理表单的值
+          const sourcePort = document.getElementById('proxySourcePort').value;
+          const targetHost = document.getElementById('proxyTargetHost').value;
+          const targetPort = document.getElementById('proxyTargetPort').value;
+          
+          // 设置通用表单的值
+          document.getElementById('sourceIP').value = '';
+          document.getElementById('sourcePort').value = sourcePort;
+          document.getElementById('targetHost').value = targetHost;
+          document.getElementById('targetPort').value = targetPort;
+          
+          // 提交表单
+          this.submit();
+        }
+      });
+    });
+    
+    function updateFormFields() {
+      const forwardingType = document.getElementById('forwardingType').value;
+      const tcpFields = document.getElementById('tcpFields');
+      const socketFields = document.getElementById('socketFields');
+      const proxyFields = document.getElementById('proxyFields');
+      const sourceAddressTooltip = document.getElementById('sourceAddressTooltip');
+      const targetAddressTooltip = document.getElementById('targetAddressTooltip');
+      const sourceAddressInput = document.getElementById('sourceAddress');
+      const targetAddressInput = document.getElementById('targetAddress');
+      const proxyTargetHostTooltip = document.getElementById('proxyTargetHostTooltip');
+      const proxyTargetPortTooltip = document.getElementById('proxyTargetPortTooltip');
+      
+      // 重置所有字段
+      document.getElementById('sourceIP').removeAttribute('required');
+      document.getElementById('sourcePort').removeAttribute('required');
+      document.getElementById('targetHost').removeAttribute('required');
+      document.getElementById('targetPort').removeAttribute('required');
+      document.getElementById('sourceAddress').removeAttribute('required');
+      document.getElementById('targetAddress').removeAttribute('required');
+      document.getElementById('proxySourcePort').removeAttribute('required');
+      document.getElementById('proxyTargetHost').removeAttribute('required');
+      document.getElementById('proxyTargetPort').removeAttribute('required');
+      
+      // 隐藏所有表单
+      tcpFields.classList.add('hidden');
+      socketFields.classList.add('hidden');
+      proxyFields.classList.add('hidden');
+      
+      if (forwardingType === 'tcp') {
+        tcpFields.classList.remove('hidden');
+        document.getElementById('sourcePort').setAttribute('required', 'required');
+        document.getElementById('targetHost').setAttribute('required', 'required');
+        document.getElementById('targetPort').setAttribute('required', 'required');
+      } else if (forwardingType === 'socks' || forwardingType === 'http') {
+        proxyFields.classList.remove('hidden');
+        document.getElementById('proxySourcePort').setAttribute('required', 'required');
+        document.getElementById('proxyTargetHost').setAttribute('required', 'required');
+        document.getElementById('proxyTargetPort').setAttribute('required', 'required');
+        
+        if (forwardingType === 'socks') {
+          proxyTargetHostTooltip.textContent = 'SOCKS代理服务器的IP地址';
+          proxyTargetPortTooltip.textContent = 'SOCKS代理服务器的端口号（如10020）';
+        } else {
+          proxyTargetHostTooltip.textContent = 'HTTP代理服务器的IP地址';
+          proxyTargetPortTooltip.textContent = 'HTTP代理服务器的端口号（如8800）';
+        }
+      } else {
+        socketFields.classList.remove('hidden');
+        document.getElementById('sourceAddress').setAttribute('required', 'required');
+        document.getElementById('targetAddress').setAttribute('required', 'required');
+        
+        if (forwardingType === 'unix_socket') {
+          sourceAddressTooltip.textContent = 'Unix Socket路径，例如：/tmp/my.sock 或 /var/run/app.sock';
+          targetAddressTooltip.textContent = 'Unix Socket路径或IP:端口格式，例如：/tmp/target.sock 或 127.0.0.1:8800';
+          sourceAddressInput.placeholder = '例如: /tmp/my.sock';
+          targetAddressInput.placeholder = '例如: /tmp/target.sock 或 127.0.0.1:8800';
+        } else if (forwardingType === 'windows_pipe') {
+          sourceAddressTooltip.textContent = 'Windows命名管道，例如：myPipe 或 \\\\.\\pipe\\myPipe';
+          targetAddressTooltip.textContent = 'Windows命名管道或IP:端口格式，例如：targetPipe 或 127.0.0.1:8800';
+          sourceAddressInput.placeholder = '例如: myPipe';
+          targetAddressInput.placeholder = '例如: targetPipe 或 127.0.0.1:8800';
+        }
+      }
+    }
+  </script>
+</body>
+</html> 
