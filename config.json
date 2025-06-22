@@ -1,0 +1,27 @@
+[
+  {
+    "id": "1747459661826",
+    "sourceIP": "0.0.0.0",
+    "sourcePort": "8855",
+    "targetHost": "127.0.0.1",
+    "targetPort": "8800",
+    "active": true,
+    "status": "active",
+    "error": "",
+    "sourceAddress": "0.0.0.0:8855",
+    "targetAddress": "127.0.0.1:8800"
+  },
+  {
+    "id": "1747460818756",
+    "sourceAddress": "0.0.0.0:9988",
+    "targetAddress": "127.0.0.1:10020",
+    "forwardingType": "socks",
+    "sourceIP": "",
+    "sourcePort": "9988",
+    "targetHost": "127.0.0.1",
+    "targetPort": "10020",
+    "active": true,
+    "status": "active",
+    "error": ""
+  }
+]
